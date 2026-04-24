@@ -25,7 +25,6 @@ jobs:
 
       - name: Run script
         env:
-          SENDER_EMAIL: ${{ secrets.EMAIL_USER }}
-          RECEIVER_EMAIL: ${{ secrets.EMAIL_USER }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         run: python scraper.py
