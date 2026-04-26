@@ -23,6 +23,9 @@ jobs:
         run: |
           pip install requests beautifulsoup4 python-dotenv
 
+      - name: Install Playwright Browsers
+        run: playwright install chromium --with-deps
+
       - name: Run script
         env:
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
