@@ -24,7 +24,7 @@ jobs:
           pip install requests beautifulsoup4 python-dotenv
 
       - name: Install Playwright Browsers
-        run: playwright install chromium --with-deps
+        run: python -m playwright install chromium --with-deps
 
       - name: Run script
         env:
