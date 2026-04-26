@@ -1,5 +1,5 @@
 import os
-import requests
+from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 import smtplib
 from datetime import datetime 
@@ -11,44 +11,76 @@ load_dotenv()
 
 def get_tweakers_news():
     url = "https://tweakers.net/nieuws/"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept-Language': 'nl-NL,nl;q=0.9,en-US;q=0.8,en;q=0.7'
-    }
+    news_data = []
     
-    try:
-        response = requests.get(url, headers=headers, timeout=15)
-        response.encoding = 'utf-8' 
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        articles = soup.select('a.fpaItemTitle', limit=5)
-        
-        if not articles:
-            articles = soup.select('div.newsContentBlock h1 a', limit=5)
-        
-        news_data = []
-        for art in articles:
-            title = art.get_text().strip()
-            link = art['href']
+    with sync_playwright() as p:
+        try:
+            print(f"Launching browser to visit {url}...")
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(viewport={'width': 1280, 'height': 800})
+            page = context.new_page()
             
-            if link.startswith('/'):
-                link = "https://tweakers.net" + link
-            
-            parent = art.find_parent('div', class_='newsContentBlock')
-            summary_text = "Klik hieronder om het volledige artikel te lezen."
-            if parent:
-                summary = parent.find('p', class_='lead')
-                if summary:
-                    summary_text = summary.get_text().strip()[:150] + "..."
-            
-            news_data.append({'title': title, 'link': link, 'summary': summary_text})
-        
-        print(f"DEBUG: Successfully found {len(news_data)} articles.")
-        return news_data
-        
-    except Exception as e:
-        print(f"Scraping error: {e}")
-        return []
+            page.goto(url, wait_until="domcontentloaded")
+
+            # --- HANDLE COOKIE WALL ---
+            try:
+                accept_button = page.wait_for_selector("button:has-text('Akkoord')", timeout=5000)
+                if accept_button:
+                    accept_button.click()
+                    print("Cookie wall cleared.")
+                    page.wait_for_load_state("networkidle") # Wait for news to load after click
+            except:
+                print("No cookie wall detected (or it's already cleared).")
+
+            # --- SCRAPE CONTENT ---
+            html = page.content()
+            soup = BeautifulSoup(html, 'html.parser')
+            news_data = []
+
+            # Select all news block
+            content_blocks = soup.find_all('div', class_='newsContentBlock')
+
+            for block in content_blocks:
+                if len(news_data) >= 5:
+                    break
+
+                # 1. Get the title and summary
+                title_el = block.select_one('h1 a')
+                summary_el = block.select_one('p.lead')
+                img_el = block.select_one('.article img')
+
+                if title_el:
+                    title = title_el.get_text(strip=True)
+                    link = title_el['href']
+                    
+                    if summary_el:
+                        summary = summary_el.get_text(strip=True)
+                    else: # fallback
+                        summary = "Lees het volledige artikel op Tweakers.net."
+
+                    image_url = ""
+                    if img_el:
+                        image_url = img_el.get('src') or img_el.get('data-src')
+
+                    # Link
+                    full_link = link if link.startswith('http') else f"https://tweakers.net{link}"
+
+                    news_data.append({
+                        'title': title,
+                        'link': full_link,
+                        'summary': (summary[:160] + "...") if len(summary) > 160 else summary,
+                        'image': image_url
+                    })
+
+            browser.close()
+            print(f"Successfully found {len(news_data)} articles.")
+            return news_data
+
+
+        except Exception as e:
+            print(f"Scraping error: {e}")
+            return []
+
 
 def send_html_email(news_list):
     sender = os.getenv("EMAIL_USER")
@@ -60,7 +92,6 @@ def send_html_email(news_list):
         return
 
     today = datetime.now().strftime("%d %B %Y")
-
     msg = MIMEMultipart('alternative')
     msg['Subject'] = f"🇳🇱 Dagelijkse Tech Nieuws - {today}"
     msg['From'] = f"Tweakers Bot <{sender}>"
@@ -68,18 +99,34 @@ def send_html_email(news_list):
 
     html_content = f"""
     <html>
-    <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; padding: 20px;">
-        <div style="max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 12px; border: 1px solid #ddd;">
+    <body style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">        
+    <div style="max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 12px; border: 1px solid #ddd;">
             <h2 style="color: #214192; border-bottom: 2px solid #214192; padding-bottom: 10px; margin-top: 0;">Goedemorgen Divyashri! ☕</h2>
-            <p style="color: #555;">Hier is de tech-update voor <strong>{today}</strong>:</p>
+            <p style="color: #555;">Hier is het technieuws van vandaag uit Nederland:</p>
     """
 
     for item in news_list:
+        if item.get("image"):
+            img_html = f"""
+                <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 200px; margin-right: 20px; margin-bottom: 15px;">
+                    <img src="{item['image']}" style="width: 100%; border-radius: 8px; display: block;">
+                </div>
+            """
+        else:
+            img_html = ""
+
         html_content += f"""
-            <div style="margin-bottom: 25px; padding: 15px; border-left: 4px solid #214192; background: #fafafa; border-radius: 0 8px 8px 0;">
-                <h3 style="margin: 0 0 10px 0;"><a href="{item['link']}" style="color: #333; text-decoration: none;">{item['title']}</a></h3>
-                <p style="font-size: 14px; color: #666; margin-bottom: 15px; line-height: 1.5;">{item['summary']}</p>
-                <a href="{item['link']}" style="background-color: #214192; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-size: 12px; font-weight: bold; display: inline-block;">LEES MEER →</a>
+            <div style="margin-bottom: 25px; padding: 20px; border-left: 4px solid #214192; background: #fafafa; border-radius: 0 8px 8px 0; overflow: hidden;">
+                {img_html}
+                <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 500px;">
+                    <h3 style="margin: 0 0 10px 0;">
+                        <a href="{item['link']}" style="color: #333; text-decoration: none;">{item['title']}</a>
+                    </h3>
+                    <p style="font-size: 14px; color: #666; margin-bottom: 15px; line-height: 1.5;">
+                        {item['summary']}
+                    </p>
+                    <a href="{item['link']}" style="background-color: #214192; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-size: 12px; font-weight: 600; display: inline-block;">LEES MEER →</a>
+                </div>
             </div>
         """
 
