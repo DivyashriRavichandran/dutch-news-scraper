@@ -23,7 +23,7 @@ A lightweight Python-based web scraper designed to extract Dutch tech news from 
 Clone the repository and install the dependencies (global or venv):
 ```bash
 git clone https://github.com/your-username/tweakers-scraper.git
-cd nl-news-scraper
+cd dutch-news-scraper
 pip install -r requirements.txt
 playwright install chromium
 ```
