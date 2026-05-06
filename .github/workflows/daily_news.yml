@@ -1,9 +1,9 @@
 name: Daily Dutch Tech News
 
 on:
-  schedule:
-    # This runs at 06:00 UTC every day 
-    - cron: '00 6 * * *'
+  # schedule:
+  #   # This runs at 06:00 UTC every day 
+  #   - cron: '00 6 * * *'
   workflow_dispatch: 
 
 jobs:
