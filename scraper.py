@@ -99,10 +99,10 @@ def send_html_email(news_list):
 
     html_content = f"""
    <html>
-    <body style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f3; margin: 0; padding: 20px;">        
-        <div style="max-width: 750px; margin: auto; background-color: #fcfbfa; padding: 30px; border-radius: 16px; border: 1px solid #e7e5e4; box-shadow: 0 4px 20px -2px rgba(28,25,23,0.05);">
-            <h2 style="color: #1c1917; border-bottom: 2px solid #e05600; padding-bottom: 12px; margin-top: 0; font-size: 24px; font-weight: 500; letter-spacing: -0.02em;">Goedemorgen Divyashri! ☕</h2>
-            <p style="color: #44403c; font-size: 15px; margin-bottom: 25px;">Hier is het technieuws van vandaag uit Nederland:</p>
+    <body style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0f172a; margin: 0; padding: 20px;">        
+        <div style="max-width: 750px; margin: auto; background-color: #1e293b; padding: 30px; border-radius: 16px; border: 1px solid #334155; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.3);">
+            <h2 style="color: #f8fafc; border-bottom: 2px solid #f97316; padding-bottom: 12px; margin-top: 0; font-size: 24px; font-weight: 500; letter-spacing: -0.02em;">Goedemorgen Divyashri! ☕</h2>
+            <p style="color: #94a3b8; font-size: 15px; margin-bottom: 25px;">Hier is het technieuws van vandaag uit Nederland:</p>
     """
 
     for item in news_list:
@@ -116,22 +116,22 @@ def send_html_email(news_list):
             img_html = ""
 
         html_content += f"""
-            <div style="margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #e7e5e4; overflow: hidden;">
+            <div style="margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #334155; overflow: hidden;">
                 {img_html}
                 <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 480px;">
                     <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 500; line-height: 1.4; letter-spacing: -0.01em;">
-                        <a href="{item['link']}" style="color: #1c1917; text-decoration: none;">{item['title']}</a>
+                        <a href="{item['link']}" style="color: #f8fafc; text-decoration: none;">{item['title']}</a>
                     </h3>
-                    <p style="font-family: Georgia, Cambria, 'Times New Roman', Times, serif; font-size: 14px; color: #57534e; margin-bottom: 16px; line-height: 1.6;">
+                    <p style="font-family: Georgia, Cambria, 'Times New Roman', Times, serif; font-size: 14px; color: #cbd5e1; margin-bottom: 16px; line-height: 1.6;">
                         {item['summary']}
                     </p>
-                    <a href="{item['link']}" style="color: #e05600; text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; display: inline-block;">LEES MEER <span style="font-family: system-ui;">→</span></a>
+                    <a href="{item['link']}" style="color: #f97316; text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; display: inline-block;">LEES MEER <span style="font-family: system-ui;">→</span></a>
                 </div>
             </div>
         """
 
     html_content += """
-                <p style="font-size: 11px; color: #a8a29e; text-align: center; margin-top: 30px; letter-spacing: 0.02em;">
+                <p style="font-size: 11px; color: #64748b; text-align: center; margin-top: 30px; letter-spacing: 0.02em;">
                     Gegenereerd door de Python News Bot.
                 </p>
             </div>
