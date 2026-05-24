@@ -99,39 +99,39 @@ def send_html_email(news_list):
 
     html_content = f"""
     <html>
-    <body style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">        
-    <div style="max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 12px; border: 1px solid #ddd;">
-            <h2 style="color: #214192; border-bottom: 2px solid #214192; padding-bottom: 10px; margin-top: 0;">Goedemorgen Divyashri! ☕</h2>
-            <p style="color: #555;">Hier is het technieuws van vandaag uit Nederland:</p>
+    <body style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f9fafb; margin: 0; padding: 20px;">        
+        <div style="max-width: 750px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 16px; border: 1px solid #f3f4f6; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <h2 style="color: #111827; border-bottom: 2px solid #ea580c; padding-bottom: 12px; margin-top: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em;">Goedemorgen Divyashri!☕</h2>
+            <p style="color: #4b5563; font-size: 15px; margin-bottom: 25px;">Hier is het technieuws van vandaag uit Nederland:</p>
     """
 
     for item in news_list:
         if item.get("image"):
             img_html = f"""
-                <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 200px; margin-right: 20px; margin-bottom: 15px;">
-                    <img src="{item['image']}" style="width: 100%; border-radius: 8px; display: block;">
+                <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 180px; margin-right: 24px; margin-bottom: 16px;">
+                    <img src="{item['image']}" style="width: 100%; border-radius: 8px; display: block; object-fit: cover;">
                 </div>
             """
         else:
             img_html = ""
 
         html_content += f"""
-            <div style="margin-bottom: 25px; padding: 20px; border-left: 4px solid #214192; background: #fafafa; border-radius: 0 8px 8px 0; overflow: hidden;">
+            <div style="margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #f3f4f6; overflow: hidden;">
                 {img_html}
-                <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 500px;">
-                    <h3 style="margin: 0 0 10px 0;">
-                        <a href="{item['link']}" style="color: #333; text-decoration: none;">{item['title']}</a>
+                <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 480px;">
+                    <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em;">
+                        <a href="{item['link']}" style="color: #111827; text-decoration: none;">{item['title']}</a>
                     </h3>
-                    <p style="font-size: 14px; color: #666; margin-bottom: 15px; line-height: 1.5;">
+                    <p style="font-family: Georgia, Cambria, 'Times New Roman', Times, serif; font-size: 14px; color: #374151; margin-bottom: 16px; line-height: 1.6;">
                         {item['summary']}
                     </p>
-                    <a href="{item['link']}" style="background-color: #214192; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-size: 12px; font-weight: 600; display: inline-block;">LEES MEER →</a>
+                    <a href="{item['link']}" style="color: #ea580c; text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; display: inline-block;">LEES MEER <span style="font-family: system-ui;">→</span></a>
                 </div>
             </div>
         """
 
     html_content += """
-            <p style="font-size: 10px; color: #aaa; text-align: center; margin-top: 30px;">
+            <p style="font-size: 11px; color: #9ca3af; text-align: center; margin-top: 30px; letter-spacing: 0.02em;">
                 Gegenereerd door de Python News Bot.
             </p>
         </div>
