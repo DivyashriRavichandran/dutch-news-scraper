@@ -97,49 +97,46 @@ def send_html_email(news_list):
     msg['From'] = f"Tweakers Bot <{sender}>"
     msg['To'] = receiver
 
-    html_content = f"""
-   <html>
-    <body style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0f172a; margin: 0; padding: 20px;">        
-        <div style="max-width: 750px; margin: auto; background-color: #1e293b; padding: 30px; border-radius: 16px; border: 1px solid #334155; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.3);">
-            <h2 style="color: #f8fafc; border-bottom: 2px solid #f97316; padding-bottom: 12px; margin-top: 0; font-size: 24px; font-weight: 500; letter-spacing: -0.02em;">Goedemorgen Divyashri! ☕</h2>
-            <p style="color: #94a3b8; font-size: 15px; margin-bottom: 25px;">Hier is het technieuws van vandaag uit Nederland:</p>
-    """
+    # Read the HTML template file
+    try:
+        with open("template.html", "r", encoding="utf-8") as f:
+            template_content = f.read()
+    except FileNotFoundError:
+        print("Error: template.html file not found next to your script.")
+        return
 
+    # Build the dynamic string block 
+    articles_html = ""
     for item in news_list:
         if item.get("image"):
             img_html = f"""
-                <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 180px; margin-right: 24px; margin-bottom: 16px;">
-                    <img src="{item['image']}" style="width: 100%; max-height:400px; border-radius: 8px; display: block; object-fit: cover;">
-                </div>
+            <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 180px; margin-right: 24px; margin-bottom: 16px;">
+                <img src="{item['image']}" style="width: 100%; max-height:400px; border-radius: 8px; display: block; object-fit: cover;">
+            </div>
             """
         else:
             img_html = ""
 
-        html_content += f"""
-            <div style="margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #334155; overflow: hidden;">
-                {img_html}
-                <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 480px;">
-                    <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 500; line-height: 1.4; letter-spacing: -0.01em;">
-                        <a href="{item['link']}" style="color: #f8fafc; text-decoration: none;">{item['title']}</a>
-                    </h3>
-                    <p style="font-family: Georgia, Cambria, 'Times New Roman', Times, serif; font-size: 14px; color: #cbd5e1; margin-bottom: 16px; line-height: 1.6;">
-                        {item['summary']}
-                    </p>
-                    <a href="{item['link']}" style="color: #f97316; text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; display: inline-block;">LEES MEER <span style="font-family: system-ui;">→</span></a>
-                </div>
+        articles_html += f"""
+        <div class="article-border" style="margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #e7e5e4; overflow: hidden;">
+            {img_html}
+            <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 480px;">
+                <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 500; line-height: 1.4; letter-spacing: -0.01em;">
+                    <a href="{item['link']}" class="text-title" style="color: #1c1917; text-decoration: none;">{item['title']}</a>
+                </h3>
+                <p class="text-body" style="font-family: Georgia, Cambria, 'Times New Roman', Times, serif; font-size: 14px; color: #57534e; margin-bottom: 16px; line-height: 1.6;">
+                    {item['summary']}
+                </p>
+                <a href="{item['link']}" class="accent-link" style="color: #e05600; text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; display: inline-block;">LEES MEER <span style="font-family: system-ui;">→</span></a>
             </div>
+        </div>
         """
 
-    html_content += """
-                <p style="font-size: 11px; color: #64748b; text-align: center; margin-top: 30px; letter-spacing: 0.02em;">
-                    Gegenereerd door de Python News Bot.
-                </p>
-            </div>
-        </body>
-    </html>
-    """
+    # Inject the compiled news block
+    final_html_content = template_content.replace("<!-- ARTICLES_PLACEHOLDER -->", articles_html)
 
-    msg.attach(MIMEText(html_content, 'html'))
+    # Attach the updated string and pass it to SMTP server pipeline
+    msg.attach(MIMEText(final_html_content, 'html'))
 
     try:
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
