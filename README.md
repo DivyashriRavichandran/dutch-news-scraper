@@ -1,7 +1,7 @@
 ## Dutch Tech News Scraper
 A lightweight Python-based web scraper designed to extract Dutch tech news from Tweakers.net. This tool uses Playwright to automate article collection and deliver daily email updates via GitHub Actions.
 
-<img width="1213" height="739" alt="Email Preview" src="https://github.com/user-attachments/assets/14df4bf2-2474-4764-893b-5a22306323c9" />
+<img width="2000" height="1206" alt="scraper" src="https://github.com/user-attachments/assets/d6686a9b-7076-4942-aec1-a68abc9a6834" />
 
 ## ✨ Features
 - Daily Automation: Scheduled via GitHub Actions (CRON).
