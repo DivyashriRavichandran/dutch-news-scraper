@@ -44,3 +44,7 @@ EMAIL_PASSWORD="your-app-password"
   ```
 - GitHub Actions:
   To automate this script, ensure that EMAIL_USER and EMAIL_PASSWORD are configured in your repository's Actions Secrets. The workflow is configured to trigger the scraper on a daily CRON schedule.
+
+## System Design
+
+<img width="634" height="698" alt="news-scraper" src="https://github.com/user-attachments/assets/3c32c700-6e99-441c-84ae-6379ccc0faf7" />
